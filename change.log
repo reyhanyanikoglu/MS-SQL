@@ -1,0 +1,107 @@
+CREATE DATABASE vtys2023
+USE vtys2023 --bu 
+
+CREATE TABLE personel (
+personel_id int NOT NULL, --UNIQUE ,--personel adında int türünde sütun, boş bırakılamaz
+ad nvarchar(50),
+soyad nvarchar(50),   --sütunlar arasına virgülle ayrılmalı
+adres nvarchar(250),
+telefon nvarchar(20)
+UNIQUE(personel_id) --personel_id sütununu UNIQUE yap demek ya da yukarıda UNIQUE 
+)
+
+CREATE TABLE personel98 (
+personel_id int NOT NULL, --UNIQUE ,--personel adında int türünde sütun, boş bırakılamaz
+ad nvarchar(50),
+soyad nvarchar(50),   --sütunlar arasına virgülle ayrılmalı
+adres nvarchar(250),
+telefon nvarchar(20),
+CONSTRAINT tekilyap UNIQUE(personel_id) --constraint kullanımı
+)
+
+CREATE TABLE bolum (
+bolum_id int NOT NULL IDENTITY(1,1) PRIMARY KEY,
+--IDENTITY otomatik olarak 1'den başlayarak 1'er 1'er artsın bu sütun demek bunu yapınca dışardan doldurulmaya gerek kalmaz
+ad nvarchar(50),
+kodu nvarchar(10),
+birim_no int 
+)
+--bölüm tablosunda bolum_id'e sağ tıklayıp properties'e bastığımızda Identity seed ve identity increment de 
+--anlıyoruz 1'er 1'er artacak
+
+CREATE TABLE ogrenci9 (
+ogrenci_id int NOT NULL IDENTITY(1,1),
+PRIMARY KEY(ogrenci_id), --primary key bu şekilde de verilebilir yanına yazılarakta
+ad nvarchar(50),
+soyad nvarchar(50),
+adres nvarchar(250),
+bolum_id int FOREIGN KEY REFERENCES bolum(bolum_id) --bu bolum_id'den yukarıdaki bölüm tablosuna ulaşmak istiyorum
+--başka tablodaki primary key'i bu tabloya foreign key olarak ekleme : 
+-- ad tür FOREIGN KEY REFERENCES tablo_adı(sütun_adı)
+CONSTRAINT yabanci_anahtar FOREING KEY REFERENCES bolum(bolum_id)
+--constraint ile bu şekilde isme sahip bir yabancı anahtar oluşturabiliriz
+)
+
+CREATE TABLE ogrenci5 (
+ogrenci_id int NOT NULL IDENTITY(1,1),
+PRIMARY KEY(ogrenci_id), --primary key bu şekilde de verilebilir yanına yazılarakta
+ad nvarchar(50),
+soyad nvarchar(50),
+adres nvarchar(250),
+bolum_id int FOREIGN KEY REFERENCES bolum(bolum_id) --bu bolum_id'den yukarıdaki bölüm tablosuna ulaşmak istiyorum
+--başka tablodaki primary key'i bu tabloya foreign key olarak ekleme : 
+-- ad tür FOREIGN KEY REFERENCES tablo_adı(sütun_adı)
+CONSTRAINT yabanci_anahtar FOREING KEY REFERENCES bolum(bolum_id) ON UPTADE CASCADE
+--ON UPTADE CASCADE ekleyince fark şu oldu : 
+--ben bolum_id'de güncelleme silme vs yaptığımda gidip bolum tablosundaki bolum_id'yi de güncelleyecek
+)
+
+CREATE TABLE notlar2 (
+not_id int NOT NULL IDENTITY(1,1) PRIMARY KEY,
+ogrenci_id int,
+ders_id int,
+sinav_tur int,
+puan int CHECK(puan <= 100 AND puan >= 0) --puan 0-100 arası girilebilir sadece
+--puan 0-100 arasında olduğu için sınırlama yapacağız CHECK komutu ile
+--CHECK CONSTRAINT olarakta tanımlanabilir
+--CONSTRAINT kontrol CHECK(puan <= 100 AND puan >= 0)
+)
+
+--CREATE oluşturdu
+--ALTER var olanı değiştir demek
+
+--ALTER TABLE notlar2 ADD tarih smalldatetime NOT NULL
+varolan notlar2 tablosuna tarih değişkeni sütununu ekle
+
+ALTER TABLE notlar2 DROP COLUMN tarih --tarih sütununu sil 
+
+--sütunda değişiklik yapma
+ALTER TABLE notlar2 ALTER COLUMN puan int NOT NULL
+
+ALTER TABLE notlar2 ADD CONSTRAINT kontrol2 CHECK(ders_id<1000)
+
+ALTER TABLE notlar2 DROP CONSTRAINT kontrol2 
+
+--Tablo Silme
+DROP TABLE notlar2
+
+--veritabanını silme
+DROP DATABASE vtys2023
+
+--Tablo Sıfırlama
+TRUNCATE TABLE notlar2 tablo tamamen sıfırlanır
+
+--SELECT İFADESİ
+SELECT * from personel --bütün sütunları getirdi
+select ad,soyad from personel --sadece ad ve soyadları getirecek
+SELECT * from personel WHERE telefon > 550 AND adres = 'ankara' --birden fazla koşul yazabiliriz
+--telefon sütununda 550'den büyük olanları getir bütun sütunlarını
+select * from personel WHERE soyad IN ('arslan','erdem')
+select * from personel WHERE soyad = 'arslan' OR soyad = 'erdem' --yukarıdaki sorguya eşit
+--soyad sütununda arslan ve erdem olanları getir demek
+select * from personel WHERE soyad LIKE '%A%'
+--önünde veya sonunda ne olduğuna bakmazsızın a harfi içerenleri getir
+select * from personel WHERE soyad LIKE 'A%'
+--soyad sütununda a ile başlasın sonrasında ne oluğunun bir önemi yok
+select * from personel WHERE soyad LIKE '%A'
+--a ile bitsin başka önemi yok
